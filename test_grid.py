@@ -10,29 +10,19 @@ def gen_hex_color():
         color.append(random.choice('0123456789ABCDEF'))
     return ''.join(color)
 
-def make_square(n):
-    s = turtle.Turtle()
-    #s.ht()
-    #s.speed(0)
-    s.pen(pencolor="black", pensize=2, shown=True, pendown=False, speed=4)
-    s.begin_poly()
-    m = n * 50
-    for x in range(2):
-        s.forward(m)
-        s.left(90)
-        s.forward(m)
-        s.left(90)
-    s.end_poly()
-    p = s.get_poly()
-    turtle.register_shape('mysquare', p)
+#helps the script exit gracefully.
+def run():
+    global RUNNING
+    RUNNING = False
 
-
+#change fill color. next time fill color is toggled, the new color will be used.
 def new_fill():
     global CURRENT_FILL, MEMORY, SWITCH
     SWITCH = False
     CURRENT_FILL = gen_hex_color()
     MEMORY = CURRENT_FILL
 
+#toggle fill color of square: current fill vs. no fill (bgcolor).
 def toggle_fill(x=None, y=None):
     global CURRENT_FILL, MEMORY, BGCOLOR, SWITCH
     SWITCH = True
@@ -42,33 +32,34 @@ def toggle_fill(x=None, y=None):
         else:
             CURRENT_FILL = BGCOLOR
 
-def draw_grid(n):
-    #make_square(n)
+#draw a square and allow the fill color to be toggled or changed to a new random color.
+def draw_square(n):
     t = turtle.Turtle()
-    t.pen(pensize=2, resizemode='user', stretchfactor=(5,5), outline=2, fillcolor=BGCOLOR)
+    t.pen(pensize=2, resizemode='user', stretchfactor=(n, n), outline=2, fillcolor=BGCOLOR)
     t.shape('square')
-    t.shapesize(10, 10)
-    #center grid
+    #center
     start_coord = -n / 2
     t.setpos(start_coord, start_coord)
-    while True:
+    while RUNNING:
         global WN
         WN.onkey(new_fill, "space")
+        WN.onkey(run, 'q')
         WN.listen()
         t.onclick(toggle_fill)
         global SWITCH
         if SWITCH == True:
             t.fillcolor(CURRENT_FILL)
+    WN.exitonclick()
 
 #===========================================================
 
 #GLOBAL VARIABLES
 
-#fav colors
 BGCOLOR = '#aa995a'
 MEMORY = gen_hex_color()
 CURRENT_FILL = BGCOLOR
 SWITCH = False
+RUNNING = True
 
 #set up screen
 WN = turtle.Screen()
@@ -78,6 +69,6 @@ WN.bgcolor(BGCOLOR)
 
 #===========================================================
 
-draw_grid(5)
+draw_square(10)
 
 
